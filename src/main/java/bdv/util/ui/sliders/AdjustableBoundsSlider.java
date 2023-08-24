@@ -11,6 +11,7 @@ public class AdjustableBoundsSlider extends AbstractAdjustableSliderBasedControl
 		super(manageThisSlider, associatedValueSpinner, associatedLowBound, associatedHighBound);
 	}
 
+	// ================================= convenience builder with GUI arrangement =================================
 	public static AdjustableBoundsSlider createAndPlaceHere(final Container intoThisComponent,
 	                                                        final int initialValue,
 	                                                        final int initialMin,

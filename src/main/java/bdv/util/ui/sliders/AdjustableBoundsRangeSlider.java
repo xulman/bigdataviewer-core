@@ -7,6 +7,8 @@ import java.awt.*;
 
 public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedControl {
 	protected final RangeSlider rangeSlider;
+	protected final SpinnerNumberModel highSpinner;
+
 	public AdjustableBoundsRangeSlider(final RangeSlider manageThisSlider,
 	                                   final JSpinner associatedLowValueSpinner,
 	                                   final JSpinner associatedHighValueSpinner,
@@ -15,21 +17,23 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 		super(manageThisSlider, associatedLowValueSpinner, associatedLowBound, associatedHighBound);
 		this.rangeSlider = manageThisSlider;
 
-		//listeners setup: setting the slider from the associated spinner
 		final SpinnerModel m = associatedHighValueSpinner.getModel();
 		if (! (m instanceof SpinnerNumberModel))
 			throw new IllegalArgumentException("The provided spinner for high-value is expected to be of the type SpinnerNumberModel.");
-		final SpinnerNumberModel nm = (SpinnerNumberModel)m; //NB: safe to cast...
-		nm.addChangeListener(l -> {
-			int value = (int)nm.getValue();
-			value = Math.max(slider.getMinimum(), Math.min(value, slider.getMaximum()));
-			nm.setValue(value); //basically, assures that the spinner is also not outside the current bounds
+		highSpinner = (SpinnerNumberModel)m; //NB: safe to cast...
+
+		//listeners setup: make sure the slider follows values set in the associated spinner
+		highSpinner.addChangeListener(l -> {
+			int value = highSpinner.getNumber().intValue();
+			//spinner may be set with arbitrary value, assure it's within slider's range
+			value = Math.max(rangeSlider.getMinimum(), Math.min(value, rangeSlider.getMaximum()));
 			rangeSlider.setUpperValue(value);
+			highSpinner.setValue(value); //make sense only if the original value was outside the slider's range
 		});
 
 		//listeners setup: forwarder also to the associated high-value spinner
 		rangeSlider.addChangeListener(event -> {
-			nm.setValue(rangeSlider.getUpperValue());
+			highSpinner.setValue(rangeSlider.getUpperValue());
 		});
 	}
 
@@ -41,6 +45,7 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 		return rangeSlider.getUpperValue();
 	}
 
+	// ================================= execution: managing slider thumbs =================================
 	protected int originalSliderUpperValue = -1; //aka before-dragging-value
 	@Override
 	protected void storeSliderThumbsPositions() {
@@ -61,6 +66,7 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 		return lowChanged || highChanged;
 	}
 
+	// ================================= convenience builder with GUI arrangement =================================
 	public static AdjustableBoundsRangeSlider createAndPlaceHere(final Container intoThisComponent,
 	                                                             final int initialLowValue,
 	                                                             final int initialHighValue,
@@ -87,10 +93,12 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 		RangeSlider slider = new RangeSlider(initialMin, initialMax);
 		slider.setValue(initialLowValue);
 		slider.setUpperValue(initialHighValue);
+		//
 		JSpinner lowSpinner = new JSpinner(
 				AbstractAdjustableSliderBasedControl.createAppropriateSpinnerModel(initialLowValue) );
 		JSpinner highSpinner = new JSpinner(
 				AbstractAdjustableSliderBasedControl.createAppropriateSpinnerModel(initialHighValue) );
+		//
 		JLabel lowBoundInformer = new JLabel(String.valueOf(initialMin));
 		JLabel highBoundInformer = new JLabel(String.valueOf(initialMax));
 

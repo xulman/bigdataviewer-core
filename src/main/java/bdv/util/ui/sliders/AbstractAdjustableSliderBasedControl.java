@@ -15,15 +15,19 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	/** represents the Control key, which is changeable and shared among all such controls
 	 * (to warrant all are controlled the same way) */
 	public static int CONTROL_KEY_keycode = 17;
+	//TODO: fix the hardcoded ctrl key in EventHandler::mouseEntered()
+
 	/** represents the left mouse button, which is changeable and shared among all such controls
 	 * (to warrant all are controlled the same way) */
 	public static int MOUSE_BUTTON_code = 1;
+	//TODO: fix the hardcoded L mouse button in EventHandler::mouseEntered()
 
 	/** provide here own mouse movement to boundary change "scaler",
-	 * this is intentionally available as of per-slider basis  */
+	 * this is intentionally available as of per-slider basis so that
+	 * every instance (control GUI element) can have different "sensitivity" */
 	public BoundaryValuesProvider boundarySetter = BOUNDARY_SETTER_CUBE_FUN;
 
-	// ================================= helper builders =================================
+	// ================================= mouse move sensitivity setters =================================
 	public interface BoundaryValuesProvider {
 		int boundaryDeltaOnThisMouseMove(final int mouseDeltaInPx);
 	}
@@ -40,7 +44,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	};
 
 	public static SpinnerNumberModel createAppropriateSpinnerModel(int withThisCurrentValue) {
-		return createAppropriateSpinnerModel(withThisCurrentValue, 50);
+		return createAppropriateSpinnerModel(withThisCurrentValue, 20);
 	}
 	public static SpinnerNumberModel createAppropriateSpinnerModel(int withThisCurrentValue,
 	                                                               int withThisStep) {
@@ -51,40 +55,44 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	protected final JSlider slider;
 	protected final JLabel lowBoundInfo;
 	protected final JLabel highBoundInfo;
+	protected final SpinnerNumberModel spinner;
 
-	//internal shortcuts
+	//internal shortcuts: maximum possible slider's range
 	static final int MIN_BOUND_LIMIT = 0;
 	static final int MAX_BOUND_LIMIT = 65535;
 
 	public AbstractAdjustableSliderBasedControl(final JSlider manageThisSlider,
 	                                            final JSpinner associatedValueSpinner,
-	                                            final JLabel associatedLowBound,
-	                                            final JLabel associatedHighBound) {
+	                                            final JLabel associatedLowBoundLabel,
+	                                            final JLabel associatedHighBoundLabel) {
 		slider = manageThisSlider;
-		lowBoundInfo = associatedLowBound;
-		highBoundInfo = associatedHighBound;
+		lowBoundInfo = associatedLowBoundLabel;
+		highBoundInfo = associatedHighBoundLabel;
+
+		final SpinnerModel m = associatedValueSpinner.getModel();
+		if (! (m instanceof SpinnerNumberModel))
+			throw new IllegalArgumentException("The provided spinner is expected to be of the type SpinnerNumberModel.");
+		spinner = (SpinnerNumberModel)m; //NB: safe to cast...
 
 		//add tooltip but only if there's none already
 		if (slider.getToolTipText() == null) {
 			slider.setToolTipText("Press and hold both CTRL and left-mouse-button while dragging the mouse horizontally to adjust sliding range.");
 		}
 
-		//listeners setup: setting the slider from the associated spinner
-		final SpinnerModel m = associatedValueSpinner.getModel();
-		if (! (m instanceof SpinnerNumberModel))
-			throw new IllegalArgumentException("The provided spinner is expected to be of the type SpinnerNumberModel.");
-		final SpinnerNumberModel nm = (SpinnerNumberModel)m; //NB: safe to cast...
-		nm.addChangeListener(l -> {
-			int value = (int)nm.getValue();
+		//listeners setup: make sure the slider follows values set in the associated spinner
+		spinner.addChangeListener(l -> {
+			int value = spinner.getNumber().intValue();
+			//spinner may be set with arbitrary value, assure it's within slider's range
 			value = Math.max(slider.getMinimum(), Math.min(value, slider.getMaximum()));
 			slider.setValue(value);
-			nm.setValue(value); //basically, assures that the spinner is also not outside the current bounds
+			spinner.setValue(value); //make sense only if the original value was outside the slider's range
 		});
 
 		//listeners setup: forwarder to the associated spinner and also
 		//to client listeners (for which it triggers only on truly relevant slider changes)
 		slider.addChangeListener(event -> {
-			nm.setValue(slider.getValue());
+			//NB: assuming that slider value can never get outside slider's range (no tests here)
+			spinner.setValue(slider.getValue());
 			if (!isInControllingMode) tellListenersThatSliderHasChanged(event);
 		});
 
@@ -112,8 +120,8 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		originalSliderValue = slider.getValue();
 	}
 	protected void fixupSliderThumbsPositions() {
-		//make sure that the slider is not changing while adjusting its boundary,
-		//which may not be always possible (as the boundary is allowed to move
+		//make sure that the slider is not unnecessarily changing its value while adjusting
+		//its boundary, which may not be always possible (as the boundary is allowed to move
 		//irrespective of what the slider value was)
 		if (originalSliderValue < slider.getMinimum()) slider.setValue(slider.getMinimum());
 		else if (originalSliderValue > slider.getMaximum()) slider.setValue(slider.getMaximum());
@@ -131,7 +139,6 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	private int initialBoundaryValue = 0;
 	private boolean isMinBoundaryControlled = false;
 
-	//meant originally for derived classes...
 	public boolean isInControllingMode() {
 		return isInControllingMode;
 	}
@@ -212,7 +219,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void mouseEntered(MouseEvent mouseEvent) {
 			//during the mouse dragging, we might have gotten out of the slider area;
 			//when outside, the keyboard and mouse buttons change might have changed but
-			//this object is now aware of it (as its listeners couldn't be triggered);
+			//this object is not aware of it (as its listeners couldn't be triggered);
 			//
 			//now, when the mouse pointer is coming back, we have to reset the statuses
 			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
