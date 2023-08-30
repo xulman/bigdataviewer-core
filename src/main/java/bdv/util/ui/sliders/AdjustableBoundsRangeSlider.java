@@ -91,6 +91,38 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 		return rangeSlider.getUpperValue();
 	}
 
+	/**
+	 * @see RangeSlider#setRange(int, int)
+	 */
+	public void setRange(final int lower, final int upper) {
+		rangeSlider.setRange(lower, upper);
+	}
+
+	/**
+	 * @see AbstractAdjustableSliderBasedControl#setSlidingRange(int, int)
+	 */
+	@Override
+	public void setSlidingRange(int lowBound, int highBound) {
+		checkAgainstBoundsOrThrow(lowBound, "new MIN bound");
+		checkAgainstBoundsOrThrow(highBound, "new MAX bound");
+		if (lowBound > highBound)
+			throw new IllegalArgumentException("MIN bound ("+lowBound
+					+") shouldn't be greater than MAX bound ("+highBound+")");
+
+		//keep now the future values of both slider's thumbs
+		final int lowerValue = Math.max(lowBound, Math.min(rangeSlider.getValue(), highBound));
+		final int upperValue = Math.max(lowBound, Math.min(rangeSlider.getUpperValue(), highBound));
+
+		rangeSlider.setMinimum(lowBound);
+		rangeSlider.setMaximum(highBound);
+		lowBoundInfo.setText(String.valueOf(lowBound));
+		highBoundInfo.setText(String.valueOf(highBound));
+
+		//to make sure the slider "has fixed" its values the way we wanted
+		rangeSlider.setValue(lowerValue);
+		rangeSlider.setUpperValue(upperValue);
+	}
+
 	// ================================= execution: managing slider thumbs =================================
 	protected int originalSliderUpperValue = -1; //aka before-dragging-value
 	@Override

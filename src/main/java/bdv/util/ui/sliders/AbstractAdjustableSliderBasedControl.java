@@ -194,6 +194,30 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		return slider.getValue();
 	}
 
+	/**
+	 * API to programmatically adjust the slider's range, the slider value is
+	 * "squeezed in between" if need be
+	 * @param lowBound    the new low/min boundary
+	 * @param highBound   the new high/max boundary
+	 */
+	public void setSlidingRange(int lowBound, int highBound) {
+		checkAgainstBoundsOrThrow(lowBound, "new MIN bound");
+		checkAgainstBoundsOrThrow(highBound, "new MAX bound");
+		if (lowBound > highBound)
+			throw new IllegalArgumentException("MIN bound ("+lowBound
+					+") shouldn't be greater than MAX bound ("+highBound+")");
+
+		//keep now the future value of the slider
+		final int value = Math.max(lowBound, Math.min(slider.getValue(), highBound));
+
+		slider.setMinimum(lowBound);
+		slider.setMaximum(highBound);
+		lowBoundInfo.setText(String.valueOf(lowBound));
+		highBoundInfo.setText(String.valueOf(highBound));
+
+		slider.setValue(value); //to make sure the slider "has fixed" its value the way we wanted
+	}
+
 	// ================================= execution: managing slider thumbs =================================
 	//only for derived classes...
 	protected int originalSliderValue = -1; //aka before-dragging-value
