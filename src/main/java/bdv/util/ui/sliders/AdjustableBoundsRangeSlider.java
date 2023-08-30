@@ -28,6 +28,8 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 			//spinner may be set with arbitrary value, assure it's within slider's range
 			value = Math.max(rangeSlider.getMinimum(), Math.min(value, rangeSlider.getMaximum()));
 			rangeSlider.setUpperValue(value);
+			//was it blocked by the lowerValue?
+			if (rangeSlider.getUpperValue() > value) value = rangeSlider.getUpperValue();
 			highSpinner.setValue(value); //make sense only if the original value was outside the slider's range
 		});
 

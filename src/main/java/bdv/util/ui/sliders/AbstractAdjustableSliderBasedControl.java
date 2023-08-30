@@ -89,6 +89,11 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//spinner may be set with arbitrary value, assure it's within slider's range
 			value = Math.max(slider.getMinimum(), Math.min(value, slider.getMaximum()));
 			slider.setValue(value);
+			//if slider was actually a rangeSlider, it may have failed due to the upperValue;
+			//in general, we check now if slider did what we asked it for and if not, it must
+			//have had its reasons (would have invalidated its model), so we accept it and
+			//learn where it ended up and synchronize (in the following row) to that value too
+			if (slider.getValue() < value) value = slider.getValue();
 			spinner.setValue(value); //make sense only if the original value was outside the slider's range
 		});
 
