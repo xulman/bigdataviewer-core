@@ -38,7 +38,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		return mouseDeltaInPx > 0 ? (int)d : (int)-d;
 	};
 	public final static BoundaryValuesProvider BOUNDARY_SETTER_CUBE_FUN = mouseDeltaInPx -> {
-		float d = (float)mouseDeltaInPx/15.f;
+		float d = (float)mouseDeltaInPx/25.f;
 		d *= d*d;
 		return (int)d;
 	};
