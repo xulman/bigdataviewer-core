@@ -40,6 +40,15 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
 
+/**
+ * The implementation of the two-thumbs, range horizontal slider with associated spinners
+ * for low and high slider values and two informative labels that, besides linking these
+ * four GUI elements and governing their co-operation, especially allows to modify
+ * the slider's range using the slider itself (with keyboard modifier key and
+ * mouse dragging). {@link AbstractAdjustableSliderBasedControl Read further here.}
+ *
+ * @author Vladimir Ulman
+ */
 public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedControl {
 	protected final RangeSlider rangeSlider;
 	protected final SpinnerNumberModel highSpinner;
@@ -104,6 +113,17 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 	}
 
 	// ================================= convenience builder with GUI arrangement =================================
+
+	/**
+	 * Creates, places and layouts the relevant controls to into the given component,
+	 * and returns
+	 * @param intoThisComponent    a Swing component into which the slider's ensemble is placed
+	 * @param initialLowValue      position the slider's lower thumb to this value
+	 * @param initialHighValue     position the slider's higher thumb to this value
+	 * @param initialLowBoundary   use this low/min boundary (slider's range)
+	 * @param initialHighBoundary  use this high/max boundary (slider's range)
+	 * @return                     the controlling object to which one hook up listeners
+	 */
 	public static AdjustableBoundsRangeSlider createAndPlaceHere(final Container intoThisComponent,
 	                                                             final int initialLowValue,
 	                                                             final int initialHighValue,

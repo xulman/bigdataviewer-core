@@ -42,6 +42,34 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+/**
+ * A common basis for {@code JSlider}-based controls whose sliding range
+ * can be adjusted directly using the slider itself, with modifier key
+ * and mouse drag. No additional (GUI) control is required to give a user
+ * the possibility to adjust the slider range.
+ *
+ * Such slider, see {@link AbstractAdjustableSliderBasedControl()}, expects
+ * a two informative {@code JLabel} items in which it echos the current
+ * range boundaries, one {@code JLabel} for low/min bound and one for high/max.
+ *
+ * Furthermore, {@code JSpinner} is requested using which slider's current value
+ * is explicitly expressed (visible to the user), and which can also control the
+ * slider itself. To devise such {@code JSpinner}, that is especially compatible
+ * with this slider, one can use {@link AbstractAdjustableSliderBasedControl#createAppropriateSpinnerModel(int)}.
+ *
+ * This slider's range adjusting happens by dragging a mouse horizontally over
+ * either left-half of the slider area (to control low/min boundary) or right-half
+ * (for high/max boundary). That said, mouse pointer's horizontal position is considered
+ * and its range is translated into how much the respective boundary should change.
+ * The mapping from mouse-move-delta to boundary-change-delta, essentially a "mouse
+ * sensitivity profile", is controlled with the attribute {@link AbstractAdjustableSliderBasedControl#boundarySetter}
+ * and {@link BoundaryValuesProvider}. Three "profiles" are predefined, namely linear,
+ * quadratric and cubic (used by default). The later offer more "drastic" change of
+ * the boundary as mouse is dragged further away; user first adjust magnitude-wise
+ * the boundary, and then, in another dragging-session, fine-tunes it.
+ *
+ * @author Vladimir Ulman
+ */
 public abstract class AbstractAdjustableSliderBasedControl {
 
 	/** represents the Control key, which is changeable and shared among all such controls
@@ -54,9 +82,9 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	public static int MOUSE_BUTTON_code = 1;
 	//TODO: fix the hardcoded L mouse button in EventHandler::mouseEntered()
 
-	/** provide here own mouse movement to boundary change "scaler",
-	 * this is intentionally available as of per-slider basis so that
-	 * every instance (control GUI element) can have different "sensitivity" */
+	/** an own mouse movement to boundary change "scaler", aka "mouse sensitivity
+	 * profile"; this is intentionally available as of per-slider basis so that
+	 * every instance (control GUI element) can exhibit different "sensitivity" */
 	public BoundaryValuesProvider boundarySetter = BOUNDARY_SETTER_CUBE_FUN;
 
 	// ================================= mouse move sensitivity setters =================================
@@ -75,9 +103,22 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		return (int)d;
 	};
 
+	/**
+	 * The same as {@link AbstractAdjustableSliderBasedControl#createAppropriateSpinnerModel(int, int)}
+	 * but with a default step-size.
+	 */
 	public static SpinnerNumberModel createAppropriateSpinnerModel(int withThisCurrentValue) {
 		return createAppropriateSpinnerModel(withThisCurrentValue, 20);
 	}
+
+	/**
+	 * Helper factory method to eventually create a {@code Spinner} from the returned
+	 * {@code SpinnerNumberModel} that can operate on the same range of values.
+	 *
+	 * @param withThisCurrentValue  initial value of the spinner
+	 * @param withThisStep          step-size of the spinner
+	 * @return                      spinner model appropriate for these sliders
+	 */
 	public static SpinnerNumberModel createAppropriateSpinnerModel(int withThisCurrentValue,
 	                                                               int withThisStep) {
 		return new SpinnerNumberModel(withThisCurrentValue, MIN_BOUND_LIMIT, MAX_BOUND_LIMIT, withThisStep);
@@ -185,6 +226,12 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	}
 
 	// ================================= execution: events handling =================================
+
+	/**
+	 * Internal aggregated handler of various mouse and keyboard events
+	 * using which the slider understands if it is in {@link AbstractAdjustableSliderBasedControl#isInControllingMode()}
+	 * and whether it should be reading out mouse positions, modify its bounds etc.
+	 */
 	protected class EventHandler
 	implements KeyListener, MouseListener, MouseMotionListener {
 		@Override
