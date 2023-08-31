@@ -14,14 +14,12 @@ public class AdjustableBoundsSlider extends AbstractAdjustableSliderBasedControl
 	// ================================= convenience builder with GUI arrangement =================================
 	public static AdjustableBoundsSlider createAndPlaceHere(final Container intoThisComponent,
 	                                                        final int initialValue,
-	                                                        final int initialMin,
-	                                                        final int initialMax) {
-		if (initialValue < initialMin || initialValue > initialMax)
+	                                                        final int initialLowBoundary,
+	                                                        final int initialHighBoundary) {
+		checkAgainstBoundsOrThrow(initialLowBoundary, "MIN bound");
+		checkAgainstBoundsOrThrow(initialHighBoundary, "MAX bound");
+		if (initialValue < initialLowBoundary || initialValue > initialHighBoundary)
 			throw new IllegalArgumentException("Refuse to create slider showing value that's outside the slider's min and max range.");
-		if (initialMin < MIN_BOUND_LIMIT || initialMin > MAX_BOUND_LIMIT)
-			throw new IllegalArgumentException("Required MIN bound is outside the interval assumed by this governing class.");
-		if (initialMax < MIN_BOUND_LIMIT || initialMax > MAX_BOUND_LIMIT)
-			throw new IllegalArgumentException("Required MAX bound is outside the interval assumed by this governing class.");
 
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		intoThisComponent.setLayout( gridBagLayout );
@@ -32,11 +30,11 @@ public class AdjustableBoundsSlider extends AbstractAdjustableSliderBasedControl
 		final Insets defaultInset = c.insets;
 
 		//set to the current wanted range
-		JSlider slider = new JSlider(JSlider.HORIZONTAL, initialMin, initialMax, initialValue);
+		JSlider slider = new JSlider(JSlider.HORIZONTAL, initialLowBoundary, initialHighBoundary, initialValue);
 		JSpinner spinner = new JSpinner(
 				AbstractAdjustableSliderBasedControl.createAppropriateSpinnerModel(initialValue) );
-		JLabel lowBoundInformer = new JLabel(String.valueOf(initialMin));
-		JLabel highBoundInformer = new JLabel(String.valueOf(initialMax));
+		JLabel lowBoundInformer = new JLabel(String.valueOf(initialLowBoundary));
+		JLabel highBoundInformer = new JLabel(String.valueOf(initialHighBoundary));
 
 		//from bigdataviewer-core/src/main/java/bdv/ui/convertersetupeditor/BoundedRangePanel.java,
 		//method updateBoundLabelFonts(), L283

@@ -60,6 +60,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	//internal shortcuts: maximum possible slider's range
 	static final int MIN_BOUND_LIMIT = 0;
 	static final int MAX_BOUND_LIMIT = 65535;
+	static protected void checkAgainstBoundsOrThrow(final int checkedValue, final String semanticsMsg) {
+		if (checkedValue < MIN_BOUND_LIMIT || checkedValue > MAX_BOUND_LIMIT)
+			throw new IllegalArgumentException("Required "+semanticsMsg+" is outside the slider's maximum range.");
+	}
 
 	public AbstractAdjustableSliderBasedControl(final JSlider manageThisSlider,
 	                                            final JSpinner associatedValueSpinner,
