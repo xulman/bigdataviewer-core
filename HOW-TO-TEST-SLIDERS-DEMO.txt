@@ -1,0 +1,14 @@
+1. compile:
+
+===>  mvn clean package dependency:copy-dependencies
+
+
+
+2a. start on Linux/Mac
+
+===>  java -cp "target/bigdataviewer-core-10.4.11-SNAPSHOT.jar:target/dependency/*" bdv.util.ui.DemoSliders
+
+
+2b. start on Windows
+
+===>  java -cp "target/bigdataviewer-core-10.4.11-SNAPSHOT.jar;target/dependency/*" bdv.util.ui.DemoSliders
