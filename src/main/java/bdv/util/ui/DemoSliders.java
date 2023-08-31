@@ -42,7 +42,7 @@ public class DemoSliders {
 	public static final int LOWVALUE = 30;
 	public static final int HIGHVALUE = 170;
 
-	public static void sliderTestPanel(final JPanel frame) {
+	public static AdjustableBoundsSlider sliderTestPanel(final JPanel frame) {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		frame.setLayout( gridBagLayout );
 
@@ -96,10 +96,12 @@ public class DemoSliders {
 			msg.setText("Current slider value: "+slider.getValue());
 			System.out.print('.');
 		});
+
+		return slider;
 	}
 
 
-	public static void rangeSliderTestPanel_ownLayoutOfControls(final JPanel frame) {
+	public static AdjustableBoundsRangeSlider rangeSliderTestPanel_ownLayoutOfControls(final JPanel frame) {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		frame.setLayout( gridBagLayout );
 
@@ -156,10 +158,12 @@ public class DemoSliders {
 		c.gridwidth = 3;
 		c.weightx = 0.2;
 		frame.add(msg, c);
+
+		return ctrl;
 	}
 
 
-	public static void rangeSliderTestPanel_defaultLayoutOfControls(final JPanel frame) {
+	public static AdjustableBoundsRangeSlider rangeSliderTestPanel_defaultLayoutOfControls(final JPanel frame) {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		frame.setLayout( gridBagLayout );
 
@@ -182,6 +186,8 @@ public class DemoSliders {
 		JLabel msg = new JLabel("Values are "+ctrl.getValue()+" and "+ctrl.getUpperValue());
 		ctrl.addChangeListener(l -> msg.setText("Values are "+ctrl.getValue()+" and "+ctrl.getUpperValue()) );
 		frame.add(msg, c);
+
+		return ctrl;
 	}
 
 
@@ -193,7 +199,7 @@ public class DemoSliders {
 		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
 		JPanel panel = new JPanel();
-		sliderTestPanel(panel);
+		AdjustableBoundsSlider sliderA = sliderTestPanel(panel);
 		c.add(panel);
 
 		c.add(new JSeparator());
@@ -201,7 +207,7 @@ public class DemoSliders {
 		c.add(new JSeparator());
 
 		panel = new JPanel();
-		rangeSliderTestPanel_ownLayoutOfControls(panel);
+		AdjustableBoundsRangeSlider sliderB = rangeSliderTestPanel_ownLayoutOfControls(panel);
 		c.add(panel);
 
 		c.add(new JSeparator());
@@ -209,8 +215,31 @@ public class DemoSliders {
 		c.add(new JSeparator());
 
 		panel = new JPanel();
-		rangeSliderTestPanel_defaultLayoutOfControls(panel);
+		AdjustableBoundsRangeSlider sliderC = rangeSliderTestPanel_defaultLayoutOfControls(panel);
 		c.add(panel);
+
+		c.add(new JSeparator());
+		c.add(new JSeparator());
+		c.add(new JSeparator());
+
+		panel = new JPanel();
+		JSpinner left = new JSpinner(new SpinnerNumberModel(0, 0,65000, 100));
+		JSpinner right = new JSpinner(new SpinnerNumberModel(65000, 0,65000, 100));
+		JButton button = new JButton("Set these sliding ranges in all sliders");
+		panel.add(left, BorderLayout.LINE_START);
+		panel.add(button, BorderLayout.CENTER);
+		panel.add(right, BorderLayout.LINE_END);
+		c.add(panel);
+
+		button.addActionListener(l -> {
+			int minBound = (int)left.getValue();
+			int maxBound = (int)right.getValue();
+			System.out.println("Setting min-max to "+minBound+" <-> "+maxBound);
+
+			sliderA.setSlidingRange(minBound,maxBound);
+			sliderB.setSlidingRange(minBound,maxBound);
+			sliderC.setSlidingRange(minBound,maxBound);
+		});
 
 		frame.pack();
 		frame.setVisible(true);
