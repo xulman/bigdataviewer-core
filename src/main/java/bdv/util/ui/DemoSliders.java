@@ -223,13 +223,28 @@ public class DemoSliders {
 		c.add(new JSeparator());
 
 		panel = new JPanel();
+		JCheckBox highlight = new JCheckBox("Enable visual aid", true);
+		highlight.setBackground(AbstractAdjustableSliderBasedControl.HIGHLIGHT_COLOR_SLIDER);
 		JSpinner left = new JSpinner(new SpinnerNumberModel(0, 0,65000, 100));
 		JSpinner right = new JSpinner(new SpinnerNumberModel(65000, 0,65000, 100));
 		JButton button = new JButton("Set these sliding ranges in all sliders");
-		panel.add(left, BorderLayout.LINE_START);
+		panel.add(highlight, BorderLayout.LINE_START);
+		panel.add(left);
 		panel.add(button, BorderLayout.CENTER);
 		panel.add(right, BorderLayout.LINE_END);
 		c.add(panel);
+
+		//sync with the initial state of the checkbox
+		sliderA.setControllingModeHighlight(true);
+		sliderB.setControllingModeHighlight(true);
+		sliderC.setControllingModeHighlight(true);
+
+		highlight.addActionListener(l -> {
+			final boolean newState = highlight.isSelected();
+			sliderA.setControllingModeHighlight(newState);
+			sliderB.setControllingModeHighlight(newState);
+			sliderC.setControllingModeHighlight(newState);
+		});
 
 		button.addActionListener(l -> {
 			int minBound = (int)left.getValue();
