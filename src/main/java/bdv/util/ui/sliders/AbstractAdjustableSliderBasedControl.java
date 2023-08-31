@@ -153,7 +153,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		//add tooltip but only if there's none already
 		if (slider.getToolTipText() == null) {
-			slider.setToolTipText("Press and hold both CTRL and left-mouse-button while dragging the mouse horizontally to adjust sliding range.");
+			slider.setToolTipText("FIRST press and hold Ctrl, and ONLY THEN press and hold left-mouse-button while dragging the mouse horizontally to adjust the sliding range.");
 		}
 
 		//listeners setup: make sure the slider follows values set in the associated spinner
@@ -261,8 +261,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void keyPressed(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
-				isControlKeyPressed = true;
-				if (isMouseLBpressed) isInControllingMode = true;
+				if (!isMouseLBpressed) isControlKeyPressed = true;
 			}
 		}
 
@@ -336,9 +335,14 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//now, when the mouse pointer is coming back, we have to reset the statuses
 			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 			isMouseLBpressed = (mouseEvent.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) > 0;
-			boolean wasInControllingMode = isInControllingMode;
-			isInControllingMode = isControlKeyPressed && isMouseLBpressed;
-			if (wasInControllingMode && !isInControllingMode) tellListenersThatWeEndedAdjustingMode();
+			final boolean shouldBeInControllingMode = isControlKeyPressed && isMouseLBpressed;
+			if (isInControllingMode && !shouldBeInControllingMode) {
+				//conditions no longer satisfied to continue in the controlling mode, so
+				//"exit sequence" is here; note that no similar check is here to enable
+				//the controlling mode 'cause this is not how the mode should be started
+				tellListenersThatWeEndedAdjustingMode();
+			}
+			isInControllingMode &= shouldBeInControllingMode;
 		}
 
 		@Override
