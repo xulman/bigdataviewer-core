@@ -40,6 +40,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -129,6 +130,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	protected final JLabel lowBoundInfo;
 	protected final JLabel highBoundInfo;
 	protected final SpinnerNumberModel spinner;
+	protected boolean isControlModeHighlighting = false;
 
 	//internal shortcuts: maximum possible slider's range
 	static final int MIN_BOUND_LIMIT = 0;
@@ -145,6 +147,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		slider = manageThisSlider;
 		lowBoundInfo = associatedLowBoundLabel;
 		highBoundInfo = associatedHighBoundLabel;
+
+		sliderBgInitialColor = slider.getBackground();
+		lowBoundFgInitialColor = lowBoundInfo.getForeground();
+		highBoundFgInitialColor = highBoundInfo.getForeground();
 
 		final SpinnerModel m = associatedValueSpinner.getModel();
 		if (! (m instanceof SpinnerNumberModel))
@@ -249,6 +255,33 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		return isInControllingMode;
 	}
 
+	public void setControllingModeHighlight(boolean newValue) {
+		isControlModeHighlighting = newValue;
+	}
+	public boolean getControllingModeHighlight() {
+		return isControlModeHighlighting;
+	}
+
+	private final Color sliderBgInitialColor;
+	private final Color lowBoundFgInitialColor;
+	private final Color highBoundFgInitialColor;
+	public static Color HIGHLIGHT_COLOR_SLIDER = new Color(255, 120, 120);
+	public static Color HIGHLIGHT_COLOR_LABELS = new Color(255, 0, 0);
+
+	private void highlightLowBound() {
+		slider.setBackground(HIGHLIGHT_COLOR_SLIDER);
+		lowBoundInfo.setForeground(HIGHLIGHT_COLOR_LABELS);
+	}
+	private void highlightHighBound() {
+		slider.setBackground(HIGHLIGHT_COLOR_SLIDER);
+		highBoundInfo.setForeground(HIGHLIGHT_COLOR_LABELS);
+	}
+	private void highlightNothing() {
+		slider.setBackground(sliderBgInitialColor);
+		lowBoundInfo.setForeground(lowBoundFgInitialColor);
+		highBoundInfo.setForeground(highBoundFgInitialColor);
+	}
+
 	// ================================= execution: events handling =================================
 
 	/**
@@ -269,7 +302,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void keyReleased(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
 				isControlKeyPressed = false;
-				if (isInControllingMode) tellListenersThatWeEndedAdjustingMode();
+				if (isInControllingMode) {
+					if (isControlModeHighlighting) highlightNothing();
+					tellListenersThatWeEndedAdjustingMode();
+				}
 				isInControllingMode = false;
 			}
 		}
@@ -286,6 +322,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 					isMinBoundaryControlled = ((float) mouseEvent.getX() / (float) slider.getWidth()) < 0.5f;
 					initialBoundaryValue = isMinBoundaryControlled ? slider.getMinimum() : slider.getMaximum();
 					storeSliderThumbsPositions();
+
+					if (isControlModeHighlighting) {
+						if (isMinBoundaryControlled) highlightLowBound(); else highlightHighBound();
+					}
 				}
 			}
 		}
@@ -294,7 +334,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void mouseReleased(MouseEvent mouseEvent) {
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
 				isMouseLBpressed = false;
-				if (isInControllingMode) tellListenersThatWeEndedAdjustingMode();
+				if (isInControllingMode) {
+					if (isControlModeHighlighting) highlightNothing();
+					tellListenersThatWeEndedAdjustingMode();
+				}
 				isInControllingMode = false;
 			}
 		}
@@ -340,6 +383,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 				//conditions no longer satisfied to continue in the controlling mode, so
 				//"exit sequence" is here; note that no similar check is here to enable
 				//the controlling mode 'cause this is not how the mode should be started
+				if (isControlModeHighlighting) highlightNothing();
 				tellListenersThatWeEndedAdjustingMode();
 			}
 			isInControllingMode &= shouldBeInControllingMode;
