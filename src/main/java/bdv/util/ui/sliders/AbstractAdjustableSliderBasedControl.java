@@ -313,7 +313,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void keyPressed(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
-				if (!isMouseLBpressed) isControlKeyPressed = true;
+				if (!isMouseLBpressed) {
+					isControlKeyPressed = true;
+					disableSlider();
+				}
 			}
 		}
 
@@ -321,6 +324,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void keyReleased(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
 				isControlKeyPressed = false;
+				enableSlider();
 				if (isInControllingMode) {
 					if (isControlModeHighlighting) highlightNothing();
 					tellListenersThatWeEndedAdjustingMode();
@@ -351,6 +355,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseReleased(MouseEvent mouseEvent) {
+			enableSlider(mouseEvent);
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
 				isMouseLBpressed = false;
 				if (isInControllingMode) {
@@ -363,6 +368,16 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseDragged(MouseEvent mouseEvent) {
+			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			if (!isControlKeyPressed) {
+				enableSlider();
+				if (isInControllingMode) {
+					if (isControlModeHighlighting) highlightNothing();
+					tellListenersThatWeEndedAdjustingMode();
+				}
+				isInControllingMode = false;
+			}
+
 			if (isInControllingMode) {
 				int deltaMove = mouseEvent.getXOnScreen() - initialMousePosition;
 				int newSliderValue = initialBoundaryValue + boundarySetter.boundaryDeltaOnThisMouseMove(deltaMove);
@@ -396,6 +411,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//
 			//now, when the mouse pointer is coming back, we have to reset the statuses
 			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			enableSlider(isControlKeyPressed);
 			isMouseLBpressed = (mouseEvent.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) > 0;
 			final boolean shouldBeInControllingMode = isControlKeyPressed && isMouseLBpressed;
 			if (isInControllingMode && !shouldBeInControllingMode) {
@@ -418,7 +434,9 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void mouseExited(MouseEvent mouseEvent) { /* intentionally empty */ }
 
 		@Override
-		public void mouseMoved(MouseEvent mouseEvent) { /* intentionally empty */ }
+		public void mouseMoved(MouseEvent mouseEvent) {
+			enableSlider(mouseEvent);
+		}
 	}
 
 	// ================================= execution: listeners =================================
