@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Color;
+import java.awt.Component;
 import java.util.ArrayList;
 
 /**
@@ -189,6 +190,16 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		slider.addKeyListener(handler);
 		slider.addMouseListener(handler);
 		slider.addMouseMotionListener(handler);
+
+		//when mouse cursor moves outside the area of the slider, the slider's
+		//listeners are no longer triggered (until the cursor is back again);
+		//but since the slider can become disabled (grayed-out) this way, and not
+		//turned back (enabled) until the mouse comes back again, we listen
+		//for mouse moves (using which it is possible monitor the ctrl modifier status)
+		//in the largest enclosing area, by finding the furthest parent...
+		Component c = slider;
+		while (c.getParent() != null) c = c.getParent();
+		c.addMouseMotionListener(handler);
 	}
 
 	public JSlider getSlider() {
