@@ -282,6 +282,25 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		highBoundInfo.setForeground(highBoundFgInitialColor);
 	}
 
+	private boolean isSliderDisabled = false;
+	private void disableSlider() {
+		slider.setEnabled(false);
+		isSliderDisabled = true;
+	}
+	private void enableSlider() {
+		if (isSliderDisabled) {
+			slider.setEnabled(true);
+			isSliderDisabled = false;
+			slider.grabFocus();
+		}
+	}
+	private void enableSlider(final MouseEvent e) {
+		enableSlider( (e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0 );
+	}
+	private void enableSlider(final boolean isCtrlPressed) {
+		if (!isCtrlPressed) enableSlider();
+	}
+
 	// ================================= execution: events handling =================================
 
 	/**
