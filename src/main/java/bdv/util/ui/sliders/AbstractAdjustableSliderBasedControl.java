@@ -246,6 +246,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	// ================================= execution: internal state =================================
 	private boolean isControlKeyPressed = false;
 	private boolean isMouseLBpressed = false;
+	private boolean isMouseOverSlider = false;
 	private boolean isInControllingMode = false;
 	private int initialMousePosition = 0;
 	private int initialBoundaryValue = 0;
@@ -443,6 +444,9 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
 			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 			enableSlider(isControlKeyPressed);
+			isMouseOverSlider =
+					mouseEvent.getX() > 0 && mouseEvent.getX() < slider.getWidth()
+					&& mouseEvent.getY() > 0 && mouseEvent.getY() < slider.getHeight();
 		}
 	}
 
