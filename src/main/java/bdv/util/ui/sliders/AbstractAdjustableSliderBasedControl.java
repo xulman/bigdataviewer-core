@@ -190,16 +190,6 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		slider.addKeyListener(handler);
 		slider.addMouseListener(handler);
 		slider.addMouseMotionListener(handler);
-
-		//when mouse cursor moves outside the area of the slider, the slider's
-		//listeners are no longer triggered (until the cursor is back again);
-		//but since the slider can become disabled (grayed-out) this way, and not
-		//turned back (enabled) until the mouse comes back again, we listen
-		//for mouse moves (using which it is possible monitor the ctrl modifier status)
-		//in the largest enclosing area, by finding the furthest parent...
-		Component c = slider;
-		while (c.getParent() != null) c = c.getParent();
-		c.addMouseMotionListener(handler);
 	}
 
 	public JSlider getSlider() {
@@ -370,8 +360,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void mouseReleased(MouseEvent mouseEvent) {
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
-				if ( mouseEvent.getX() < 0 || mouseEvent.getX() > slider.getWidth()
-				  || mouseEvent.getY() < 0 || mouseEvent.getY() > slider.getHeight() ) {
+				if (!isMouseOverSlider) {
 					//mouse event happened outside the slider element, definitively enable again;
 					//this can occur only when mouse got outside during dragging
 					isControlKeyPressed = false;
@@ -432,6 +421,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseEntered(MouseEvent mouseEvent) {
+			isMouseOverSlider = true;
 			//inside/over-the-elem, the elem is able to monitor its ctrl status normally,
 			//but it is blind to events that happened outside, especially it couldn't monitor
 			//the ctrl status which we thus need to update here - on the re-entry event
@@ -441,6 +431,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseExited(MouseEvent mouseEvent) {
+			isMouseOverSlider = false;
 			if (!isInControllingMode) {
 				isControlKeyPressed = false;
 				enableSlider();
@@ -458,9 +449,6 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
 			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 			enableSlider(isControlKeyPressed);
-			isMouseOverSlider =
-					mouseEvent.getX() > 0 && mouseEvent.getX() < slider.getWidth()
-					&& mouseEvent.getY() > 0 && mouseEvent.getY() < slider.getHeight();
 		}
 	}
 
