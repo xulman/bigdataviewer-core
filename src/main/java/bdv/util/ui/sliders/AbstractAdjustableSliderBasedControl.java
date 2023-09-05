@@ -336,6 +336,8 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void mousePressed(MouseEvent mouseEvent) {
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
+				//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
+				isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 				isMouseLBpressed = true;
 				if (isControlKeyPressed) {
 					isInControllingMode = true;
@@ -368,7 +370,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseDragged(MouseEvent mouseEvent) {
-			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			//during the dragging, the mouse may get outside the elem in which case
+			//the elem is no longer able to monitor is ctrl status, so we have to
+			//take care of it explicitly here
+			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 			if (!isControlKeyPressed) {
 				enableSlider();
 				if (isInControllingMode) {
@@ -435,7 +440,9 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseMoved(MouseEvent mouseEvent) {
-			enableSlider(mouseEvent);
+			//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
+			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			enableSlider(isControlKeyPressed);
 		}
 	}
 
