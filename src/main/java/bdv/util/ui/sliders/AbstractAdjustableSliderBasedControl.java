@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Color;
+import java.awt.Component;
 import java.util.ArrayList;
 
 /**
@@ -189,6 +190,16 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		slider.addKeyListener(handler);
 		slider.addMouseListener(handler);
 		slider.addMouseMotionListener(handler);
+
+		//when mouse cursor moves outside the area of the slider, the slider's
+		//listeners are no longer triggered (until the cursor is back again);
+		//but since the slider can become disabled (grayed-out) this way, and not
+		//turned back (enabled) until the mouse comes back again, we listen
+		//for mouse moves (using which it is possible monitor the ctrl modifier status)
+		//in the largest enclosing area, by finding the furthest parent...
+		Component c = slider;
+		while (c.getParent() != null) c = c.getParent();
+		c.addMouseMotionListener(handler);
 	}
 
 	public JSlider getSlider() {
@@ -246,6 +257,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	// ================================= execution: internal state =================================
 	private boolean isControlKeyPressed = false;
 	private boolean isMouseLBpressed = false;
+	private boolean isMouseOverSlider = false;
 	private boolean isInControllingMode = false;
 	private int initialMousePosition = 0;
 	private int initialBoundaryValue = 0;
@@ -282,6 +294,25 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		highBoundInfo.setForeground(highBoundFgInitialColor);
 	}
 
+	private boolean isSliderDisabled = false;
+	private void disableSlider() {
+		slider.setEnabled(false);
+		isSliderDisabled = true;
+	}
+	private void enableSlider() {
+		if (isSliderDisabled) {
+			slider.setEnabled(true);
+			isSliderDisabled = false;
+			slider.grabFocus();
+		}
+	}
+	private void enableSlider(final MouseEvent e) {
+		enableSlider( (e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0 );
+	}
+	private void enableSlider(final boolean isCtrlPressed) {
+		if (!isCtrlPressed) enableSlider();
+	}
+
 	// ================================= execution: events handling =================================
 
 	/**
@@ -294,7 +325,10 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void keyPressed(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
-				if (!isMouseLBpressed) isControlKeyPressed = true;
+				if (!isMouseLBpressed && isMouseOverSlider) {
+					isControlKeyPressed = true;
+					disableSlider();
+				}
 			}
 		}
 
@@ -302,6 +336,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void keyReleased(KeyEvent keyEvent) {
 			if (keyEvent.getKeyCode() == CONTROL_KEY_keycode) {
 				isControlKeyPressed = false;
+				enableSlider();
 				if (isInControllingMode) {
 					if (isControlModeHighlighting) highlightNothing();
 					tellListenersThatWeEndedAdjustingMode();
@@ -313,6 +348,8 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void mousePressed(MouseEvent mouseEvent) {
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
+				//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
+				isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
 				isMouseLBpressed = true;
 				if (isControlKeyPressed) {
 					isInControllingMode = true;
@@ -333,6 +370,17 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		@Override
 		public void mouseReleased(MouseEvent mouseEvent) {
 			if (mouseEvent.getButton() == MOUSE_BUTTON_code) {
+				if ( mouseEvent.getX() < 0 || mouseEvent.getX() > slider.getWidth()
+				  || mouseEvent.getY() < 0 || mouseEvent.getY() > slider.getHeight() ) {
+					//mouse event happened outside the slider element, definitively enable again;
+					//this can occur only when mouse got outside during dragging
+					isControlKeyPressed = false;
+					enableSlider();
+				} else {
+					//inside the element, enable based on the true ctrl status; and since
+					//inside/over-the-elem, the elem is able to monitor its ctrl status normally
+					enableSlider(mouseEvent);
+				}
 				isMouseLBpressed = false;
 				if (isInControllingMode) {
 					if (isControlModeHighlighting) highlightNothing();
@@ -344,6 +392,19 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseDragged(MouseEvent mouseEvent) {
+			//during the dragging, the mouse may get outside the elem in which case
+			//the elem is no longer able to monitor is ctrl status, so we have to
+			//take care of it explicitly here
+			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			if (!isControlKeyPressed) {
+				enableSlider();
+				if (isInControllingMode) {
+					if (isControlModeHighlighting) highlightNothing();
+					tellListenersThatWeEndedAdjustingMode();
+				}
+				isInControllingMode = false;
+			}
+
 			if (isInControllingMode) {
 				int deltaMove = mouseEvent.getXOnScreen() - initialMousePosition;
 				int newSliderValue = initialBoundaryValue + boundarySetter.boundaryDeltaOnThisMouseMove(deltaMove);
@@ -371,22 +432,19 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 		@Override
 		public void mouseEntered(MouseEvent mouseEvent) {
-			//during the mouse dragging, we might have gotten out of the slider area;
-			//when outside, the keyboard and mouse buttons change might have changed but
-			//this object is not aware of it (as its listeners couldn't be triggered);
-			//
-			//now, when the mouse pointer is coming back, we have to reset the statuses
+			//inside/over-the-elem, the elem is able to monitor its ctrl status normally,
+			//but it is blind to events that happened outside, especially it couldn't monitor
+			//the ctrl status which we thus need to update here - on the re-entry event
 			isControlKeyPressed = (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
-			isMouseLBpressed = (mouseEvent.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) > 0;
-			final boolean shouldBeInControllingMode = isControlKeyPressed && isMouseLBpressed;
-			if (isInControllingMode && !shouldBeInControllingMode) {
-				//conditions no longer satisfied to continue in the controlling mode, so
-				//"exit sequence" is here; note that no similar check is here to enable
-				//the controlling mode 'cause this is not how the mode should be started
-				if (isControlModeHighlighting) highlightNothing();
-				tellListenersThatWeEndedAdjustingMode();
+			if (isControlKeyPressed) disableSlider();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent mouseEvent) {
+			if (!isInControllingMode) {
+				isControlKeyPressed = false;
+				enableSlider();
 			}
-			isInControllingMode &= shouldBeInControllingMode;
 		}
 
 		@Override
@@ -396,10 +454,14 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		public void mouseClicked(MouseEvent mouseEvent) { /* intentionally empty */ }
 
 		@Override
-		public void mouseExited(MouseEvent mouseEvent) { /* intentionally empty */ }
-
-		@Override
-		public void mouseMoved(MouseEvent mouseEvent) { /* intentionally empty */ }
+		public void mouseMoved(MouseEvent mouseEvent) {
+			//update the ctrl key flag, but here it is not allowed to turn it on even when ctrl is pressed
+			isControlKeyPressed &= (mouseEvent.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) > 0;
+			enableSlider(isControlKeyPressed);
+			isMouseOverSlider =
+					mouseEvent.getX() > 0 && mouseEvent.getX() < slider.getWidth()
+					&& mouseEvent.getY() > 0 && mouseEvent.getY() < slider.getHeight();
+		}
 	}
 
 	// ================================= execution: listeners =================================
