@@ -150,6 +150,7 @@ class BoundedRangePanel extends JPanel
 		this.add( upperBoundLabel, "right, wrap" );
 		this.add( lowerBoundLabel, "right" );
 
+		this.range = range;
 		setRange( range );
 	}
 
@@ -231,26 +232,12 @@ class BoundedRangePanel extends JPanel
 	private void setupMinSpinner()
 	{
 		UIUtils.setPreferredWidth( minSpinner, 70 );
-
-		minSpinner.addChangeListener( e -> {
-			final double value = ( Double ) minSpinner.getValue();
-			if ( value != range.getMin() )
-				updateRange( range.withMin( value ) );
-		} );
-
 		minSpinner.setEditor( new UnboundedNumberEditor( minSpinner ) );
 	}
 
 	private void setupMaxSpinner()
 	{
 		UIUtils.setPreferredWidth( maxSpinner, 70 );
-
-		maxSpinner.addChangeListener( e -> {
-			final double value = ( Double ) maxSpinner.getValue();
-			if ( value != range.getMax() )
-				updateRange( range.withMax( value ) );
-		} );
-
 		maxSpinner.setEditor( new UnboundedNumberEditor( maxSpinner ) );
 	}
 
@@ -258,9 +245,12 @@ class BoundedRangePanel extends JPanel
 	{
 		UIUtils.setPreferredWidth( originalRangeSlider, 50 );
 
-		rangeSlider.addChangeListener( e -> {
-			updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getUpperValue() ) ) );
-		} );
+		rangeSlider.addChangeListener(e -> updateRange( new BoundedRange(
+				rangeSlider.getRangeSlider().getMinimum(),
+				rangeSlider.getRangeSlider().getMaximum(),
+				rangeSlider.getValue(),
+				rangeSlider.getUpperValue()
+		) ) );
 
 		originalRangeSlider.addComponentListener( new ComponentAdapter()
 		{
@@ -378,38 +368,35 @@ class BoundedRangePanel extends JPanel
 
 	public synchronized void setRange( final BoundedRange range )
 	{
+		//skip if no change at all
 		if ( Objects.equals( this.range, range ) )
 			return;
 
+		//new obj given, have bounds changed?
+		if (this.range.getMinBound() != range.getMinBound()
+			|| this.range.getMaxBound() != range.getMaxBound()) {
+			//yes, bounds changed -> update visual
+			blockUpdates = true;
+
+			final double minBound = range.getMinBound();
+			final double maxBound = range.getMaxBound();
+
+			//TODO not necessary if the change was triggered from the slider itself
+			rangeSlider.setSlidingRange((int)minBound, (int)maxBound);
+			rangeSlider.setRange((int)range.getMin(), (int)range.getMax());
+
+			final double frac = Math.max(
+					Math.abs( Math.round( minBound ) - minBound ),
+					Math.abs( Math.round( maxBound ) - maxBound ) );
+			final String format = frac > 0.005 ? "%.2f" : "%.0f";
+			upperBoundLabel.setText( String.format( format, maxBound ) );
+			lowerBoundLabel.setText( String.format( format, minBound ) );
+			this.invalidate();
+
+			blockUpdates = false;
+		}
+
 		this.range = range;
-
-		blockUpdates = true;
-
-		final double minBound = range.getMinBound();
-		final double maxBound = range.getMaxBound();
-
-		final SpinnerNumberModel minSpinnerModel = ( SpinnerNumberModel ) minSpinner.getModel();
-		minSpinnerModel.setMinimum( minBound );
-		minSpinnerModel.setMaximum( maxBound );
-		minSpinnerModel.setValue( range.getMin() );
-
-		final SpinnerNumberModel maxSpinnerModel = ( SpinnerNumberModel ) maxSpinner.getModel();
-		maxSpinnerModel.setMinimum( minBound );
-		maxSpinnerModel.setMaximum( maxBound );
-		maxSpinnerModel.setValue( range.getMax() );
-
-		rangeSlider.setRange( valueToPos( range.getMin() ), valueToPos( range.getMax() ) );
-
-		final double frac = Math.max(
-				Math.abs( Math.round( minBound ) - minBound ),
-				Math.abs( Math.round( maxBound ) - maxBound ) );
-		final String format = frac > 0.005 ? "%.2f" : "%.0f";
-		upperBoundLabel.setText( String.format( format, maxBound ) );
-		lowerBoundLabel.setText( String.format( format, minBound ) );
-		this.invalidate();
-
-		blockUpdates = false;
-
 		listeners.list.forEach( ChangeListener::boundedRangeChanged );
 	}
 
