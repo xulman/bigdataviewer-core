@@ -159,8 +159,8 @@ class BoundedRangePanel extends JPanel
 		super.setEnabled( enabled );
 		if ( minSpinner != null )
 			minSpinner.setEnabled( enabled );
-		if ( rangeSlider != null )
-			rangeSlider.setEnabled( enabled );
+		if ( originalRangeSlider != null )
+			originalRangeSlider.setEnabled( enabled );
 		if ( maxSpinner != null )
 			maxSpinner.setEnabled( enabled );
 		if ( upperBoundLabel != null )
@@ -204,8 +204,8 @@ class BoundedRangePanel extends JPanel
 		super.setBackground( bg );
 		if ( minSpinner != null )
 			minSpinner.setBackground( bg );
-		if ( rangeSlider != null )
-			rangeSlider.setBackground( bg );
+		if ( originalRangeSlider != null )
+			originalRangeSlider.setBackground( bg );
 		if ( maxSpinner != null )
 			maxSpinner.setBackground( bg );
 		if ( upperBoundLabel != null )
@@ -256,15 +256,13 @@ class BoundedRangePanel extends JPanel
 
 	private void setupRangeSlider()
 	{
-		UIUtils.setPreferredWidth( rangeSlider, 50 );
-		rangeSlider.setRange( 0, SLIDER_LENGTH );
-		rangeSlider.setFocusable( false );
+		UIUtils.setPreferredWidth( originalRangeSlider, 50 );
 
 		rangeSlider.addChangeListener( e -> {
 			updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getUpperValue() ) ) );
 		} );
 
-		rangeSlider.addComponentListener( new ComponentAdapter()
+		originalRangeSlider.addComponentListener( new ComponentAdapter()
 		{
 			@Override
 			public void componentResized( final ComponentEvent e )
@@ -319,7 +317,7 @@ class BoundedRangePanel extends JPanel
 			}
 		};
 		this.addMouseListener( ml );
-		rangeSlider.addMouseListener( ml );
+		//rangeSlider.addMouseListener( ml ); //TODO what is the popup here?
 	}
 
 	/**
@@ -350,7 +348,7 @@ class BoundedRangePanel extends JPanel
 //		if ( userDefinedNumberFormat )
 //			return;
 
-		final int sw = rangeSlider.getWidth();
+		final int sw = originalRangeSlider.getWidth();
 		if ( sw > 0 )
 		{
 			final double vrange = range.getMaxBound() - range.getMinBound();
