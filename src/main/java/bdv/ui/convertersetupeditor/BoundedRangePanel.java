@@ -86,11 +86,6 @@ class BoundedRangePanel extends JPanel
 	private final AdjustableBoundsRangeSlider rangeSlider;
 
 	/**
-	 * Range slider number of steps.
-	 */
-	private static final int SLIDER_LENGTH = 10000;
-
-	/**
 	 * The minimum spinner.
 	 */
 	private final JSpinner minSpinner;
@@ -308,29 +303,6 @@ class BoundedRangePanel extends JPanel
 		};
 		this.addMouseListener( ml );
 		//rangeSlider.addMouseListener( ml ); //TODO what is the popup here?
-	}
-
-	/**
-	 * Convert range-slider position to value.
-	 *
-	 * @param pos
-	 *            of range-slider
-	 */
-	private double posToValue( final int pos )
-	{
-		final double dmin = range.getMinBound();
-		final double dmax = range.getMaxBound();
-		return ( pos * ( dmax - dmin ) / SLIDER_LENGTH ) + dmin;
-	}
-
-	/**
-	 * Convert value to range-slider position.
-	 */
-	private int valueToPos( final double value )
-	{
-		final double dmin = range.getMinBound();
-		final double dmax = range.getMaxBound();
-		return ( int ) Math.round( ( value - dmin ) * SLIDER_LENGTH / ( dmax - dmin ) );
 	}
 
 	private synchronized void updateNumberFormat()
