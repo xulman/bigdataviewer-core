@@ -59,6 +59,7 @@ import org.scijava.listeners.Listeners;
 
 import bdv.ui.UIUtils;
 import bdv.ui.rangeslider.RangeSlider;
+import bdv.util.ui.sliders.AdjustableBoundsRangeSlider;
 import bdv.util.BoundedRange;
 
 /**
@@ -81,7 +82,8 @@ class BoundedRangePanel extends JPanel
 	/**
 	 * The range slider.
 	 */
-	private final RangeSlider rangeSlider;
+	private final RangeSlider originalRangeSlider;
+	private final AdjustableBoundsRangeSlider rangeSlider;
 
 	/**
 	 * Range slider number of steps.
@@ -131,9 +133,10 @@ class BoundedRangePanel extends JPanel
 
 		minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
 		maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
-		rangeSlider = new RangeSlider( 0, SLIDER_LENGTH );
+		originalRangeSlider = new RangeSlider( 0, (int)Math.floor(range.getMaxBound()-range.getMinBound()) );
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
+		rangeSlider = new AdjustableBoundsRangeSlider(originalRangeSlider, minSpinner,maxSpinner, lowerBoundLabel,upperBoundLabel);
 
 		setupMinSpinner();
 		setupMaxSpinner();
@@ -142,7 +145,7 @@ class BoundedRangePanel extends JPanel
 		setupPopupMenu();
 
 		this.add( minSpinner, "sy 2" );
-		this.add( rangeSlider, "growx, sy 2" );
+		this.add( originalRangeSlider, "growx, sy 2" );
 		this.add( maxSpinner, "sy 2" );
 		this.add( upperBoundLabel, "right, wrap" );
 		this.add( lowerBoundLabel, "right" );
