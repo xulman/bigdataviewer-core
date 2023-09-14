@@ -55,7 +55,7 @@ public final class BoundedRange
 	public BoundedRange( final double minBound, final double maxBound, final double min, final double max )
 	{
 		if ( ( minBound > min ) || ( maxBound < max ) || ( min > max ) )
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("got this wrong setup: min/maxBounds="+minBound+"/"+maxBound+", min/max="+min+"/"+max);
 
 		this.minBound = minBound;
 		this.maxBound = maxBound;
