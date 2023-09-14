@@ -453,23 +453,34 @@ public abstract class AbstractAdjustableSliderBasedControl {
 
 	// ================================= execution: listeners =================================
 	protected final java.util.List<ChangeListener> valuesChangedListeners = new ArrayList<>(10);
+	protected final java.util.List<ChangeListener> boundsChangedListeners = new ArrayList<>(10);
 
 	public void addValuesChangedListener(final ChangeListener listener) {
 		valuesChangedListeners.add(listener);
+	}
+	public void addBoundsChangedListener(final ChangeListener listener) {
+		boundsChangedListeners.add(listener);
 	}
 
 	public void removeValuesChangedListener(final ChangeListener listener) {
 		valuesChangedListeners.remove(listener);
 	}
+	public void removeBoundsChangedListener(final ChangeListener listener) {
+		boundsChangedListeners.remove(listener);
+	}
 
 	protected void tellListenersThatSliderHasChangedValues(final ChangeEvent event) {
 		valuesChangedListeners.forEach(listener -> listener.stateChanged(event));
 	}
+	protected void tellListenersThatSliderHasChangedBounds(final ChangeEvent event) {
+		boundsChangedListeners.forEach(listener -> listener.stateChanged(event));
+	}
 
 	protected void tellListenersThatWeEndedAdjustingMode() {
-		//...but only when we really have changed the value before and after the adjustment
+		//notify first if the value before and after the adjustment is different
 		if (didSliderThumbsChangedPositions()) {
 			tellListenersThatSliderHasChangedValues(new ChangeEvent(slider));
 		}
+		tellListenersThatSliderHasChangedBounds(new ChangeEvent(slider));
 	}
 }
