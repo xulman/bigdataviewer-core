@@ -247,9 +247,12 @@ class BoundedRangePanel extends JPanel
 	{
 		UIUtils.setPreferredWidth( originalRangeSlider, 50 );
 
-		rangeSlider.addChangeListener(e -> {
+		rangeSlider.addValuesChangedListener(e -> {
 				lowValue = rangeSlider.getValue();
 				highValue = rangeSlider.getUpperValue();
+				notifyListeners();
+		} );
+		rangeSlider.addBoundsChangedListener(e -> {
 				lowBound = rangeSlider.getRangeSlider().getMinimum();
 				highBound = rangeSlider.getRangeSlider().getMaximum();
 				notifyListeners();
@@ -348,7 +351,6 @@ class BoundedRangePanel extends JPanel
 
 	public synchronized void setRange( final BoundedRange range )
 	{
-		System.out.println("setRange() called on range "+range);
 		blockUpdates = true;
 
 		updateThisFromRange( range );
@@ -369,7 +371,6 @@ class BoundedRangePanel extends JPanel
 	}
 
 	private synchronized void notifyListeners() {
-		System.out.println("notifying "+listeners.list.size()+" listeners");
 		listeners.list.forEach( ChangeListener::boundedRangeChanged );
 	}
 
