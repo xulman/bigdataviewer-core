@@ -36,7 +36,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import javax.swing.JFormattedTextField;
@@ -146,11 +145,11 @@ class BoundedRangePanel extends JPanel
 		this.add( upperBoundLabel, "right, wrap" );
 		this.add( lowerBoundLabel, "right" );
 
-		updateLocalFromRange( range );
+		updateThisFromRange( range );
 		setRange( range );
 	}
 
-	private void updateLocalFromRange(final BoundedRange range) {
+	private void updateThisFromRange(final BoundedRange range) {
 		lowValue = range.getMin();
 		highValue = range.getMax();
 		lowBound = range.getMinBound();
@@ -352,10 +351,9 @@ class BoundedRangePanel extends JPanel
 		System.out.println("setRange() called on range "+range);
 		blockUpdates = true;
 
-		updateLocalFromRange( range );
-
+		updateThisFromRange( range );
 		rangeSlider.setSlidingRange((int)lowBound, (int)highBound);
-		rangeSlider.setRange((int)range.getMin(), (int)range.getMax());
+		rangeSlider.setRange((int)lowValue, (int)highValue);
 
 		final double frac = Math.max(
 				Math.abs( Math.round( lowBound ) - lowBound ),
