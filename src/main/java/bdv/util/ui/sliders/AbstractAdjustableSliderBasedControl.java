@@ -41,7 +41,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Color;
-import java.awt.Component;
 import java.util.ArrayList;
 
 /**
@@ -182,7 +181,7 @@ public abstract class AbstractAdjustableSliderBasedControl {
 		slider.addChangeListener(event -> {
 			//NB: assuming that slider value can never get outside slider's range (no tests here)
 			spinner.setValue(slider.getValue());
-			if (!isInControllingMode) tellListenersThatSliderHasChanged(event);
+			if (!isInControllingMode) tellListenersThatSliderHasChangedValues(event);
 		});
 
 		//listeners setup: managing slider's limits
@@ -453,24 +452,24 @@ public abstract class AbstractAdjustableSliderBasedControl {
 	}
 
 	// ================================= execution: listeners =================================
-	protected final java.util.List<ChangeListener> listeners = new ArrayList<>(10);
+	protected final java.util.List<ChangeListener> valuesChangedListeners = new ArrayList<>(10);
 
-	public void addChangeListener(final ChangeListener listener) {
-		listeners.add(listener);
+	public void addValuesChangedListener(final ChangeListener listener) {
+		valuesChangedListeners.add(listener);
 	}
 
-	public void removeChangeListener(final ChangeListener listener) {
-		listeners.remove(listener);
+	public void removeValuesChangedListener(final ChangeListener listener) {
+		valuesChangedListeners.remove(listener);
 	}
 
-	protected void tellListenersThatSliderHasChanged(final ChangeEvent event) {
-		listeners.forEach(listener -> listener.stateChanged(event));
+	protected void tellListenersThatSliderHasChangedValues(final ChangeEvent event) {
+		valuesChangedListeners.forEach(listener -> listener.stateChanged(event));
 	}
 
 	protected void tellListenersThatWeEndedAdjustingMode() {
 		//...but only when we really have changed the value before and after the adjustment
 		if (didSliderThumbsChangedPositions()) {
-			tellListenersThatSliderHasChanged(new ChangeEvent(slider));
+			tellListenersThatSliderHasChangedValues(new ChangeEvent(slider));
 		}
 	}
 }
