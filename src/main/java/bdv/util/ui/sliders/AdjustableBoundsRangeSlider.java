@@ -74,12 +74,14 @@ public class AdjustableBoundsRangeSlider extends AbstractAdjustableSliderBasedCo
 			rangeSlider.setUpperValue(value);
 			//was it blocked by the lowerValue?
 			if (rangeSlider.getUpperValue() > value) value = rangeSlider.getUpperValue();
-			highSpinner.setValue(value); //make sense only if the original value was outside the slider's range
+			double dvalue = value; //cast needed for somewhere in BDV, TODO: failed to find the exact place of failure
+			highSpinner.setValue(dvalue); //make sense only if the original value was outside the slider's range
 		});
 
 		//listeners setup: forwarder also to the associated high-value spinner
 		rangeSlider.addChangeListener(event -> {
-			highSpinner.setValue(rangeSlider.getUpperValue());
+			double dvalue = rangeSlider.getUpperValue();
+			highSpinner.setValue(dvalue);
 		});
 	}
 

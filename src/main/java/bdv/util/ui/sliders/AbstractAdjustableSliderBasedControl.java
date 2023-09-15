@@ -173,14 +173,16 @@ public abstract class AbstractAdjustableSliderBasedControl {
 			//have had its reasons (would have invalidated its model), so we accept it and
 			//learn where it ended up and synchronize (in the following row) to that value too
 			if (slider.getValue() < value) value = slider.getValue();
-			spinner.setValue(value); //make sense only if the original value was outside the slider's range
+			double dvalue = value; //cast needed for somewhere in BDV, TODO: failed to find the exact place of failure
+			spinner.setValue(dvalue); //make sense only if the original value was outside the slider's range
 		});
 
 		//listeners setup: forwarder to the associated spinner and also
 		//to client listeners (for which it triggers only on truly relevant slider changes)
 		slider.addChangeListener(event -> {
 			//NB: assuming that slider value can never get outside slider's range (no tests here)
-			spinner.setValue(slider.getValue());
+			double dvalue = slider.getValue();
+			spinner.setValue(dvalue);
 			if (!isInControllingMode) tellListenersThatSliderHasChangedValues(event);
 		});
 
