@@ -126,8 +126,8 @@ class BoundedRangePanel extends JPanel
 		setLayout( new MigLayout( "ins 5 5 5 10, fillx, filly, hidemode 3", "[][grow][][]", "[]0[]" ) );
 		updateColors();
 
-		minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
-		maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
+		minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 65535.0, 5.0 ) );
+		maxSpinner = new JSpinner( new SpinnerNumberModel( 65535.0, 0.0, 65535.0, 5.0 ) );
 		originalRangeSlider = new RangeSlider( 0, (int)Math.floor(range.getMaxBound()-range.getMinBound()) );
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
