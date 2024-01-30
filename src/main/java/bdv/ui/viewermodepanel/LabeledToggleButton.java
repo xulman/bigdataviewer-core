@@ -28,8 +28,7 @@
  */
 package bdv.ui.viewermodepanel;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 import bdv.ui.UIUtils;
 
@@ -78,5 +77,9 @@ class LabeledToggleButton extends ToggleButton
 
 		if ( label != null )
 			setFont( label );
+	}
+
+	JToggleButton getIcon() {
+		return super.getIcon();
 	}
 }

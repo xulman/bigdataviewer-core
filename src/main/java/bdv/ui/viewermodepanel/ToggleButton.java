@@ -44,6 +44,10 @@ class ToggleButton extends JPanel
 
 	private final JToggleButton button;
 
+	JToggleButton getIcon() {
+		return button;
+	}
+
 	public ToggleButton(
 			final Icon icon,
 			final Icon selectedIcon,
