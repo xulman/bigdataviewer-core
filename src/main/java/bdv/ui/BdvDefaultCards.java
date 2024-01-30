@@ -110,6 +110,10 @@ public class BdvDefaultCards
 
 		HelpManager.HELP_KEY1 = KeyEvent.VK_J;
 		HelpManager helpManager_viewerModes = new HelpManager(displaySettingsPanel);
+		helpManager_viewerModes.registerComponentHelp(() -> System.out.println("Da Help for view modes panel... should have been here."));
+		helpManager_viewerModes.registerComponentHelp(displaySettingsPanel.getFusionIcon(),
+				HelpManager.constructURL("https://www.fi.muni.cz/~xulman/files/secret_folder/removeMe.html"),
+				"View Modes Help");
 	}
 
 	static class MyScrollPane extends JScrollPane
