@@ -98,7 +98,8 @@ public class BdvDefaultCards
 		treePanel.add( editPanelTree, BorderLayout.SOUTH );
 		treePanel.setPreferredSize( new Dimension( 300, 225 ) );
 
-		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", new DisplaySettingsPanel( viewer.state() ), true, new Insets( 0, 4, 4, 0 ) );
+		final DisplaySettingsPanel displaySettingsPanel = new DisplaySettingsPanel(viewer.state());
+		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", displaySettingsPanel, true, new Insets( 0, 4, 4, 0 ) );
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
 		cards.addCard( DEFAULT_SOURCEGROUPS_CARD, "Groups", treePanel, true, new Insets( 0, 0, 0, 0 ) );
 	}
