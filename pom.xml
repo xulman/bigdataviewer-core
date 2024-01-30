@@ -151,6 +151,11 @@
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>local-gui-help</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<!-- ImgLib2 dependencies -->
 		<dependency>
 			<groupId>net.imglib2</groupId>
