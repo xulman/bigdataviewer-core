@@ -33,10 +33,7 @@ import static bdv.viewer.Interpolation.NLINEAR;
 import static bdv.viewer.ViewerStateChange.DISPLAY_MODE_CHANGED;
 import static bdv.viewer.ViewerStateChange.INTERPOLATION_CHANGED;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import bdv.ui.UIUtils;
 import bdv.viewer.DisplayMode;
@@ -63,6 +60,13 @@ public class DisplaySettingsPanel extends JPanel
 	private final LabeledToggleButton fusion;
 	private final LabeledToggleButton grouping;
 	private final LabeledToggleButton interpolation;
+
+	public JComponent getFusionIcon() {
+		return fusion.getIcon();
+	};
+	public JComponent getFusionLabel() {
+		return fusion;
+	};
 
 	public DisplaySettingsPanel( final ViewerState state )
 	{
