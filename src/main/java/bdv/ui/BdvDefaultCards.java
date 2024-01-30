@@ -35,10 +35,15 @@ import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.ViewerState;
+import sc.fiji.gui.help.HelpManager;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
@@ -102,6 +107,9 @@ public class BdvDefaultCards
 		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", displaySettingsPanel, true, new Insets( 0, 4, 4, 0 ) );
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
 		cards.addCard( DEFAULT_SOURCEGROUPS_CARD, "Groups", treePanel, true, new Insets( 0, 0, 0, 0 ) );
+
+		HelpManager.HELP_KEY1 = KeyEvent.VK_J;
+		HelpManager helpManager_viewerModes = new HelpManager(displaySettingsPanel);
 	}
 
 	static class MyScrollPane extends JScrollPane
