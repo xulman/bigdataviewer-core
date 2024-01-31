@@ -43,6 +43,7 @@ import bdv.viewer.DisplayMode;
 import bdv.viewer.Interpolation;
 import bdv.viewer.ViewerState;
 import net.miginfocom.swing.MigLayout;
+import sc.fiji.gui.help.HelpManagerSingleton;
 
 /**
  * This panel adds buttons to toggle fused, grouped, and
@@ -85,6 +86,8 @@ public class DisplaySettingsPanel extends JPanel
 				" Group ",
 				SOURCE_MODE_TOOL_TIP,
 				GROUP_MODE_TOOL_TIP );
+		HelpManagerSingleton.obtain()
+				.registerComponentHelp( grouping.getIcon(), () -> System.out.println("dedicated grouping icon help dialog") );
 		interpolation = new LabeledToggleButton(
 				new ImageIcon( this.getClass().getResource( "nearest" + isDark + isLarge + ".png" ) ),
 				new ImageIcon( this.getClass().getResource( "linear" + isDark + isLarge + ".png" ) ),
