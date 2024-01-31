@@ -105,9 +105,13 @@ public class BdvDefaultCards
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
 		cards.addCard( DEFAULT_SOURCEGROUPS_CARD, "Groups", treePanel, true, new Insets( 0, 0, 0, 0 ) );
 
-		HelpManagerSingleton hm = HelpManagerSingleton.obtain();
-		hm.registerComponentHelp(displaySettingsPanel,() -> System.out.println("local help for the viewer modes panel"));
-		hm.registerComponentHelp(table, () -> System.out.println("local help for the sources panel"));
+		final HelpManagerSingleton hm = HelpManagerSingleton.obtain();
+		hm.registerComponentHelp(displaySettingsPanel,
+				HelpManagerSingleton.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_ViewModes"),
+				"BDV Help on: View Modes" );
+		hm.registerComponentHelp(table,
+				HelpManagerSingleton.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_Sources"),
+				"BDV Help on: Sources table" );
 	}
 
 	static class MyScrollPane extends JScrollPane

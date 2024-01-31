@@ -86,8 +86,6 @@ public class DisplaySettingsPanel extends JPanel
 				" Group ",
 				SOURCE_MODE_TOOL_TIP,
 				GROUP_MODE_TOOL_TIP );
-		HelpManagerSingleton.obtain()
-				.registerComponentHelp( grouping.getIcon(), () -> System.out.println("dedicated grouping icon help dialog") );
 		interpolation = new LabeledToggleButton(
 				new ImageIcon( this.getClass().getResource( "nearest" + isDark + isLarge + ".png" ) ),
 				new ImageIcon( this.getClass().getResource( "linear" + isDark + isLarge + ".png" ) ),
@@ -95,6 +93,12 @@ public class DisplaySettingsPanel extends JPanel
 				" Linear ",
 				NEAREST_INTERPOLATION_TOOL_TIP,
 				LINEAR_INTERPOLATION_TOOL_TIP );
+
+		HelpManagerSingleton.obtain().registerComponentHelpForWebBrowser( fusion.getIcon(),
+				HelpManagerSingleton.constructURL("https://www.google.com") );
+		HelpManagerSingleton.obtain().registerComponentHelp( grouping.getIcon(),
+				HelpManagerSingleton.constructURL("https://www.fi.muni.cz/~xulman/files/secret_folder/removeMe.html"),
+				"View Icon Remote Help" );
 
 		fusion.setSelected( state.getDisplayMode().hasFused() );
 		grouping.setSelected( state.getDisplayMode().hasGrouping() );
