@@ -35,6 +35,8 @@ import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.ViewerState;
+import sc.fiji.gui.help.HelpManagerSingleton;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -102,6 +104,9 @@ public class BdvDefaultCards
 		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", displaySettingsPanel, true, new Insets( 0, 4, 4, 0 ) );
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
 		cards.addCard( DEFAULT_SOURCEGROUPS_CARD, "Groups", treePanel, true, new Insets( 0, 0, 0, 0 ) );
+
+		HelpManagerSingleton hm = HelpManagerSingleton.obtain();
+		hm.registerComponentHelp(displaySettingsPanel,() -> System.out.println("local help for the viewer modes panel"));
 	}
 
 	static class MyScrollPane extends JScrollPane
