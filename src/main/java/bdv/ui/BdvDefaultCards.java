@@ -107,6 +107,7 @@ public class BdvDefaultCards
 
 		HelpManagerSingleton hm = HelpManagerSingleton.obtain();
 		hm.registerComponentHelp(displaySettingsPanel,() -> System.out.println("local help for the viewer modes panel"));
+		hm.registerComponentHelp(table, () -> System.out.println("local help for the sources panel"));
 	}
 
 	static class MyScrollPane extends JScrollPane
