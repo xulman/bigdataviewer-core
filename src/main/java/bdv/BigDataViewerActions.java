@@ -49,6 +49,7 @@ import bdv.tools.bookmarks.BookmarksEditor;
 import bdv.tools.brightness.BrightnessDialog;
 import bdv.tools.crop.CropDialog;
 import bdv.tools.transformation.ManualTransformationEditor;
+import sc.fiji.gui.help.HelpManagerSingleton;
 
 public class BigDataViewerActions extends Actions
 {
@@ -67,6 +68,7 @@ public class BigDataViewerActions extends Actions
 	public static final String GO_TO_BOOKMARK = "go to bookmark";
 	public static final String GO_TO_BOOKMARK_ROTATION = "go to bookmark rotation";
 	public static final String PREFERENCES_DIALOG = "Preferences";
+	public static final String LOCAL_GUI_HELP = "local GUI help";
 
 	public static final String[] BRIGHTNESS_SETTINGS_KEYS         = new String[] { "S" };
 	public static final String[] VISIBILITY_AND_GROUPING_KEYS     = new String[] { "F6" };
@@ -83,6 +85,7 @@ public class BigDataViewerActions extends Actions
 	public static final String[] GO_TO_BOOKMARK_KEYS              = new String[] { "B" };
 	public static final String[] GO_TO_BOOKMARK_ROTATION_KEYS     = new String[] { "O" };
 	public static final String[] PREFERENCES_DIALOG_KEYS          = new String[] { "meta COMMA", "ctrl COMMA" };
+	public static final String[] LOCAL_GUI_HELP_KEYS              = new String[] { "J" };
 
 	/*
 	 * Command descriptions for all provided commands
@@ -113,6 +116,7 @@ public class BigDataViewerActions extends Actions
 			descriptions.add( GO_TO_BOOKMARK, GO_TO_BOOKMARK_KEYS, "Retrieve a labeled bookmark location." );
 			descriptions.add( GO_TO_BOOKMARK_ROTATION, GO_TO_BOOKMARK_ROTATION_KEYS, "Retrieve a labeled bookmark, set only the orientation." );
 			descriptions.add( PREFERENCES_DIALOG, PREFERENCES_DIALOG_KEYS, "Show the Preferences dialog." );
+			descriptions.add( LOCAL_GUI_HELP, LOCAL_GUI_HELP_KEYS, "Local GUI help dialogs" );
 		}
 	}
 
@@ -140,6 +144,7 @@ public class BigDataViewerActions extends Actions
 		actions.runnableAction( bdv::saveSettings, SAVE_SETTINGS, SAVE_SETTINGS_KEYS );
 		actions.runnableAction( bdv::expandAndFocusCardPanel, EXPAND_CARDS, EXPAND_CARDS_KEYS );
 		actions.runnableAction( bdv::collapseCardPanel, COLLAPSE_CARDS, COLLAPSE_CARDS_KEYS );
+		actions.runnableAction( HelpManagerSingleton.obtain().getKeyboardAction(), LOCAL_GUI_HELP, LOCAL_GUI_HELP_KEYS );
 	}
 
 	public static void toggleDialogAction( final Actions actions, final Dialog dialog, final String name, final String... defaultKeyStrokes )
