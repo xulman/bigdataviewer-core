@@ -43,7 +43,7 @@ import bdv.viewer.DisplayMode;
 import bdv.viewer.Interpolation;
 import bdv.viewer.ViewerState;
 import net.miginfocom.swing.MigLayout;
-import sc.fiji.gui.help.HelpManagerSingleton;
+import sc.fiji.gui.help.HelpManager;
 
 /**
  * This panel adds buttons to toggle fused, grouped, and
@@ -94,10 +94,10 @@ public class DisplaySettingsPanel extends JPanel
 				NEAREST_INTERPOLATION_TOOL_TIP,
 				LINEAR_INTERPOLATION_TOOL_TIP );
 
-		HelpManagerSingleton.obtain().registerComponentHelpForWebBrowser( fusion.getIcon(),
-				HelpManagerSingleton.constructURL("https://www.google.com") );
-		HelpManagerSingleton.obtain().registerComponentHelp( grouping.getIcon(),
-				HelpManagerSingleton.constructURL("https://www.fi.muni.cz/~xulman/files/secret_folder/removeMe.html"),
+		HelpManager.obtain().registerComponentHelpForWebBrowser( fusion.getIcon(),
+				HelpManager.constructURL("https://www.google.com") );
+		HelpManager.obtain().registerComponentHelp( grouping.getIcon(),
+				HelpManager.constructURL("https://www.fi.muni.cz/~xulman/files/secret_folder/removeMe.html"),
 				"View Icon Remote Help" );
 
 		fusion.setSelected( state.getDisplayMode().hasFused() );

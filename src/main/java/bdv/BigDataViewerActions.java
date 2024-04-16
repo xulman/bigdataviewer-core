@@ -49,7 +49,7 @@ import bdv.tools.bookmarks.BookmarksEditor;
 import bdv.tools.brightness.BrightnessDialog;
 import bdv.tools.crop.CropDialog;
 import bdv.tools.transformation.ManualTransformationEditor;
-import sc.fiji.gui.help.HelpManagerSingleton;
+import sc.fiji.gui.help.HelpManager;
 
 public class BigDataViewerActions extends Actions
 {
@@ -144,7 +144,7 @@ public class BigDataViewerActions extends Actions
 		actions.runnableAction( bdv::saveSettings, SAVE_SETTINGS, SAVE_SETTINGS_KEYS );
 		actions.runnableAction( bdv::expandAndFocusCardPanel, EXPAND_CARDS, EXPAND_CARDS_KEYS );
 		actions.runnableAction( bdv::collapseCardPanel, COLLAPSE_CARDS, COLLAPSE_CARDS_KEYS );
-		actions.runnableAction( HelpManagerSingleton.obtain().getKeyboardAction(), LOCAL_GUI_HELP, LOCAL_GUI_HELP_KEYS );
+		actions.runnableAction( HelpManager.obtain().getKeyboardAction(), LOCAL_GUI_HELP, LOCAL_GUI_HELP_KEYS );
 	}
 
 	public static void toggleDialogAction( final Actions actions, final Dialog dialog, final String name, final String... defaultKeyStrokes )

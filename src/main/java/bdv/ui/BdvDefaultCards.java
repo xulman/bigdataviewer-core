@@ -35,7 +35,7 @@ import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.ViewerState;
-import sc.fiji.gui.help.HelpManagerSingleton;
+import sc.fiji.gui.help.HelpManager;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -105,12 +105,12 @@ public class BdvDefaultCards
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
 		cards.addCard( DEFAULT_SOURCEGROUPS_CARD, "Groups", treePanel, true, new Insets( 0, 0, 0, 0 ) );
 
-		final HelpManagerSingleton hm = HelpManagerSingleton.obtain();
+		final HelpManager hm = HelpManager.obtain();
 		hm.registerComponentHelp(displaySettingsPanel,
-				HelpManagerSingleton.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_ViewModes"),
+				HelpManager.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_ViewModes"),
 				"BDV Help on: View Modes" );
 		hm.registerComponentHelp(table,
-				HelpManagerSingleton.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_Sources"),
+				HelpManager.constructPathToLocalTopics(BdvDefaultCards.class, "Help_Cards_Sources"),
 				"BDV Help on: Sources table" );
 	}
 
