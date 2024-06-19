@@ -43,6 +43,7 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComponent;
 
+import bdv.tools.benchmarks.TimeReporter;
 import org.scijava.listeners.Listeners;
 
 import bdv.TransformEventHandler;
@@ -208,6 +209,13 @@ public class InteractiveDisplayCanvas extends JComponent implements InteractiveD
 	public void paintComponent( final Graphics g )
 	{
 		overlayRenderers.list.forEach( r -> r.drawOverlays( g ) );
+		//System.out.println("TIMESTAMP "+System.currentTimeMillis()+" FROM THIS GUY "+reportingName);
+		TimeReporter.getInstance().reportWorkFinished(reportingName);
+	}
+
+	private String reportingName = "don't know";
+	public void setDisplayName(final String toBeReportedName) {
+		this.reportingName = toBeReportedName;
 	}
 
 	// -- deprecated API --
