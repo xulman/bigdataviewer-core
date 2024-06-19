@@ -16,25 +16,29 @@ public class TimeReporter {
 	}
 
 	private final List<Long> collectedTimes = new ArrayList<>(100);
+	private final List<String> collectedNames = new ArrayList<>(100);
 	private long initTime = -1;
 	private int wantedReportsNumber = -1;
 
 	public void startNowAndReportAfter(int wantedReportsNumber) {
 		this.wantedReportsNumber = wantedReportsNumber;
 		this.collectedTimes.clear();
+		this.collectedNames.clear();
 		this.initTime = System.currentTimeMillis();
 	}
 
 	synchronized
-	public void reportWorkFinished() {
+	public void reportWorkFinished(final String callerID) {
 		if (this.collectedTimes.size() < this.wantedReportsNumber) {
 			this.collectedTimes.add( System.currentTimeMillis() );
+			this.collectedNames.add( callerID );
 		}
 
 		if (this.collectedTimes.size() == this.wantedReportsNumber) {
 			long prevTime = initTime;
-			for (long time : collectedTimes) {
-				System.out.println("Delay from first "+(double)(time-initTime)/1000.0
+			for (int i = 0; i < wantedReportsNumber; ++i) {
+				long time = collectedTimes.get(i);
+				System.out.println(collectedNames.get(i)+": Delay from first "+(double)(time-initTime)/1000.0
 						  +" seconds; from previous "+(double)(time-prevTime)/1000.0+" seconds");
 				prevTime = time;
 			}
