@@ -1,5 +1,10 @@
 package bdv.tools.benchmarks;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
 public class TimeReporter {
 
 	private TimeReporter() {}
@@ -26,6 +31,17 @@ public class TimeReporter {
 		this.maxReportsNumber = wantedReportsNumber;
 		this.initTime = System.currentTimeMillis();
 		this.lastReportTime = this.initTime;
+		this.observedTimes.clear();
+	}
+
+	/**
+	 * A map between window IDs to ordered lists of measurements.
+	 */
+	public final Map<String, List<Double>> observedTimes = new HashMap<>(10);
+
+	void recordTime(final String window, final double observedTime) {
+		if (!observedTimes.containsKey(window)) observedTimes.put(window, new ArrayList<>(100));
+		observedTimes.get(window).add(observedTime);
 	}
 
 	/**
@@ -37,12 +53,18 @@ public class TimeReporter {
 	synchronized
 	public void reportWorkFinished(final String callerID) {
 		if (this.maxReportsNumber > 0) {
+			long time = System.currentTimeMillis();
+
+			//NB: the timestamps are the first and last operations,
+			//    to avoid counting in/to exclude this method's runtime
 			maxReportsNumber -= 1;
 
-			long time = System.currentTimeMillis();
+			double observedTime = (double)(time-lastReportTime)/1000.0;
 			System.out.println(callerID+": Delay from init "+(double)(time-initTime)/1000.0
-					+" seconds; from previous "+(double)(time-lastReportTime)/1000.0+" seconds");
-			lastReportTime = time;
+					+" seconds; from previous "+observedTime+" seconds");
+			recordTime(callerID, observedTime);
+
+			lastReportTime = System.currentTimeMillis();
 		}
 	}
 }
