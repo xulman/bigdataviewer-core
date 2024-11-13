@@ -217,6 +217,9 @@ public class InteractiveDisplayCanvas extends JComponent implements InteractiveD
 	public void setDisplayName(final String toBeReportedName) {
 		this.reportingName = toBeReportedName;
 	}
+	public String getDisplayName() {
+		return reportingName;
+	}
 
 	// -- deprecated API --
 
