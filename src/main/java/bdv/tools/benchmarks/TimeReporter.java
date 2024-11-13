@@ -34,6 +34,10 @@ public class TimeReporter {
 		this.observedTimes.clear();
 	}
 
+	public void stopReportingNow() {
+		this.maxReportsNumber = 0;
+	}
+
 	/**
 	 * A map between window IDs to ordered lists of measurements.
 	 */
@@ -60,7 +64,7 @@ public class TimeReporter {
 			maxReportsNumber -= 1;
 
 			double observedTime = (double)(time-lastReportTime)/1000.0;
-			System.out.println(callerID+": Delay from init "+(double)(time-initTime)/1000.0
+			System.out.println("  => "+callerID+": Delay from init "+(double)(time-initTime)/1000.0
 					+" seconds; from previous "+observedTime+" seconds");
 			recordTime(callerID, observedTime);
 
