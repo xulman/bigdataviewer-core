@@ -154,7 +154,7 @@
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>local-gui-help</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 		<!-- ImgLib2 dependencies -->
 		<dependency>
